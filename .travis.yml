@@ -1,0 +1,25 @@
+sudo: false
+services:
+  - docker
+language: go
+go: 1.7
+env:
+  - GOOS=linux
+    FACETTE_VERSION=f772c0d2e3bd82ee2cfb4cc3e2e7dcb2e75d263d
+
+#before_install:
+#  - apt-get update && apt-get install -q -y npm librrd-dev
+install:
+  - wget "https://github.com/facette/facette/archive/$FACETTE_VERSION.tar.gz"
+  - tar xf "$FACETTE_VERSION.tar.gz"
+  - docker run -it --rm -v "$(pwd)/build.sh:/build.sh" -v "$(pwd)/facette-$FACETTE_VERSION:/facette" --env "TRAVIS_UID=$(id -u)" golang:1.7-alpine /build.sh
+  - mv "facette-$FACETTE_VERSION/build/facette-linux-amd64" facette-linux-amd64
+  - docker build -t "quay.io/experimentalplatform/facette:$TRAVIS_BRANCH" .
+script:
+  - true
+after_success:
+ - |
+   if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then
+     docker login -u "$QUAY_USER" -p "$QUAY_PASS" quay.io
+     docker push "quay.io/experimentalplatform/facette:$TRAVIS_BRANCH"
+   fi

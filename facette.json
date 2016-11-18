@@ -1,0 +1,7 @@
+{
+	"bind": ":80",
+	"base_dir": "/facette-linux-amd64",
+	"providers_dir": "/facette-linux-amd64/providers",
+	"data_dir": "/data",
+	"pid_file": "/var/run/facette.pid"
+}
